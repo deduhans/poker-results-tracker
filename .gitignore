@@ -1,4 +1,12 @@
 .DS_Store
 
-poker-results-tracker-be/
-poker-results-tracker-fe/
+.env.prod
+.env.dev
+
+be/node_modules/
+be/dist/
+fe/node_modules/
+fe/dist/
+fe/playwright-report/
+
+*.log

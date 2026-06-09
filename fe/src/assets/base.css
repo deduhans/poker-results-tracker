@@ -1,0 +1,136 @@
+/* 
+ * Poker Results Tracker - Design System
+ * This file contains global styles, variables, and utility classes
+ */
+
+:root {
+  /* Color System - Primary palette */
+  --primary: #1976d2;         /* Main brand color - blue */
+  --primary-light: #e3f2fd;
+  --primary-dark: #0d47a1;
+  
+  /* Accent colors */
+  --accent: #8bc34a;          /* Green for positive amounts */
+  --accent-light: #dcedc8;
+  --accent-dark: #558b2f;
+  
+  /* Semantic colors */
+  --success: #4caf50;         /* Success messages, wins */
+  --warning: #ff9800;         /* Warnings, host role */
+  --error: #f44336;           /* Errors, losses */
+  --info: #2196f3;            /* Information, neutral feedback */
+  
+  /* Poker-themed colors */
+  --table-green: #35654d;     /* Classic poker table felt */
+  --chip-red: #e53935;        /* Poker chip colors */
+  --chip-blue: #1e88e5;
+  --chip-green: #43a047;
+  --chip-black: #212121;
+  
+  /* Neutral colors */
+  --background: #ffffff;
+  --surface: #f5f5f5;
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-disabled: rgba(0, 0, 0, 0.38);
+  --divider: rgba(0, 0, 0, 0.12);
+  
+  /* Spacing system */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Typography */
+  --font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* Global Base Styles */
+html {
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+}
+
+/* Typography Resets */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: var(--space-sm);
+  line-height: 1.2;
+}
+
+/* Utility Classes */
+.text-success { color: var(--success) !important; }
+.text-warning { color: var(--warning) !important; }
+.text-error { color: var(--error) !important; }
+.text-info { color: var(--info) !important; }
+
+.bg-primary { background-color: var(--primary) !important; }
+.bg-primary-light { background-color: var(--primary-light) !important; }
+.bg-surface { background-color: var(--surface) !important; }
+
+/* Spacing utilities */
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: var(--space-xs) !important; }
+.mb-2 { margin-bottom: var(--space-sm) !important; }
+.mb-3 { margin-bottom: var(--space-md) !important; }
+.mb-4 { margin-bottom: var(--space-lg) !important; }
+
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: var(--space-xs) !important; }
+.mt-2 { margin-top: var(--space-sm) !important; }
+.mt-3 { margin-top: var(--space-md) !important; }
+.mt-4 { margin-top: var(--space-lg) !important; }
+
+/* Poker specific utility classes */
+.money-positive { color: var(--accent) !important; font-weight: 500; }
+.money-negative { color: var(--error) !important; font-weight: 500; }
+
+/* Card styles */
+.player-card:hover {
+  transform: translateY(-2px);
+  transition: transform var(--transition-fast);
+}
+
+/* Status indicators */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+.status-active { background-color: var(--success); }
+.status-inactive { background-color: var(--text-disabled); }
+.status-host { background-color: var(--warning); }
+.status-admin { background-color: var(--info); }

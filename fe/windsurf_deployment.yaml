@@ -1,0 +1,4 @@
+project_id: poker-results-tracker
+framework: vue
+build_command: npm run build
+output_directory: dist

@@ -1,0 +1,23 @@
+{
+    "extends": "@vue/tsconfig/tsconfig.dom.json",
+    "include": [
+        "./e2e/**/*",
+        "./component/**/*",
+        "./support/**/*",
+        "../../src/**/*"
+    ],
+    "exclude": [
+        "./support/component.*"
+    ],
+    "compilerOptions": {
+        "isolatedModules": false,
+        "types": [
+            "cypress"
+        ],
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        }
+    }
+}

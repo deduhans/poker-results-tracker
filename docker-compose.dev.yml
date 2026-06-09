@@ -1,35 +1,33 @@
-# Docker Compose configuration for Poker Results Tracker
 services:
-  # Backend NestJS application
-  nestapp:
-    container_name: poker-nestapp
+  nestapp-dev:
+    container_name: poker-nestapp-dev
     build:
       context: ./be
       dockerfile: Dockerfile
       args:
         BUILDKIT_INLINE_CACHE: 1
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_NAME=${POSTGRES_NAME:-postgres}
+      - POSTGRES_NAME=${POSTGRES_NAME:-poker_dev}
       - POSTGRES_PORT=5432
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST=postgres-dev
       - NEST_HOST=0.0.0.0
       - NEST_PORT=3000
-      - CLIENT_HOST=${CLIENT_HOST}
-      - CLIENT_PORT=${CLIENT_PORT:-443}
+      - CLIENT_HOST=${CLIENT_HOST:-0.0.0.0}
+      - CLIENT_PORT=${CLIENT_PORT:-8080}
       - PASSPORT_SECRET=${PASSPORT_SECRET}
-      - NODE_ENV=production
-      - DB_SYNCHRONIZE=false
+      - NODE_ENV=development
+      - DB_SYNCHRONIZE=true
     env_file:
-      - .env.prod
+      - .env.dev
     depends_on:
-      postgres:
+      postgres-dev:
         condition: service_healthy
     networks:
-      - poker-network
+      - poker-network-dev
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/health" ]
@@ -38,26 +36,25 @@ services:
       retries: 3
       start_period: 10s
 
-  # Frontend Vue.js application with Caddy
-  vueapp:
-    container_name: poker-vueapp
+  vueapp-dev:
+    container_name: poker-vueapp-dev
     build:
       context: ./fe
       dockerfile: Dockerfile
       args:
         BUILDKIT_INLINE_CACHE: 1
     ports:
-      - "80:80"
+      - "8080:80"
     environment:
-      - CADDY_HOST=${CADDY_HOST:-:80}
-      - CADDY_BACKEND=poker-nestapp:3000
+      - CADDY_HOST=:80
+      - CADDY_BACKEND=poker-nestapp-dev:3000
     env_file:
-      - .env.prod
+      - .env.dev
     depends_on:
-      nestapp:
+      nestapp-dev:
         condition: service_healthy
     networks:
-      - poker-network
+      - poker-network-dev
     restart: unless-stopped
     volumes:
       - ./fe/Caddyfile:/etc/caddy/Caddyfile
@@ -68,35 +65,20 @@ services:
       retries: 3
       start_period: 5s
 
-  cloudflared:
-    container_name: poker-cloudflared
-    image: cloudflare/cloudflared:latest
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
-    networks:
-      - poker-network
-    depends_on:
-      vueapp:
-        condition: service_healthy
-
-  # PostgreSQL database
-  postgres:
-    container_name: poker-postgres-prod
+  postgres-dev:
+    container_name: poker-postgres-dev
     image: postgres:15-alpine
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "5434:5432"
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_DB=${POSTGRES_NAME:-postgres}
+      - POSTGRES_DB=${POSTGRES_NAME:-poker_dev}
     volumes:
-      - pgdata-prod:/var/lib/postgresql/data
+      - pgdata-dev:/var/lib/postgresql/data
     networks:
-      - poker-network
-    # Add healthcheck for the database
+      - poker-network-dev
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
@@ -105,8 +87,8 @@ services:
       start_period: 10s
 
 networks:
-  poker-network:
+  poker-network-dev:
     driver: bridge
 
 volumes:
-  pgdata-prod:
+  pgdata-dev:

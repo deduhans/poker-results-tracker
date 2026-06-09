@@ -1,0 +1,59 @@
+{
+    admin off
+}
+
+{$CADDY_HOST:":80"} {
+    # Forward all API requests directly to the backend
+    # This section catches ALL requests to /users, /auth, /rooms, etc.
+    handle /users* {
+        reverse_proxy {$CADDY_BACKEND:poker-nestapp:3000} {
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    handle /auth* {
+        reverse_proxy {$CADDY_BACKEND:poker-nestapp:3000} {
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    handle /rooms* {
+        reverse_proxy {$CADDY_BACKEND:poker-nestapp:3000} {
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    handle /players* {
+        reverse_proxy {$CADDY_BACKEND:poker-nestapp:3000} {
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    handle /exchanges* {
+        reverse_proxy {$CADDY_BACKEND:poker-nestapp:3000} {
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # For everything else, serve the SPA
+    handle {
+        root * /srv
+        try_files {path} /index.html
+        file_server
+    }
+}
