@@ -7,7 +7,7 @@ services:
       args:
         BUILDKIT_INLINE_CACHE: 1
     ports:
-      - "3001:3000"
+      - "3101:3000"
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
@@ -17,7 +17,7 @@ services:
       - NEST_HOST=0.0.0.0
       - NEST_PORT=3000
       - CLIENT_HOST=${CLIENT_HOST:-0.0.0.0}
-      - CLIENT_PORT=${CLIENT_PORT:-8080}
+      - CLIENT_PORT=${CLIENT_PORT:-8181}
       - PASSPORT_SECRET=${PASSPORT_SECRET}
       - NODE_ENV=development
       - DB_SYNCHRONIZE=true
@@ -44,7 +44,7 @@ services:
       args:
         BUILDKIT_INLINE_CACHE: 1
     ports:
-      - "8080:80"
+      - "8181:80"
     environment:
       - CADDY_HOST=:80
       - CADDY_BACKEND=poker-nestapp-dev:3000
@@ -70,7 +70,7 @@ services:
     image: postgres:15-alpine
     restart: unless-stopped
     ports:
-      - "5434:5432"
+      - "5535:5432"
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
