@@ -9,29 +9,27 @@ jobs:
     steps:
       - name: Install cloudflared
         run: |
-          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
           sudo dpkg -i cloudflared-linux-amd64.deb
 
-      - name: Setup SSH config
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          cat >> ~/.ssh/config << EOF
+          cat >> ~/.ssh/config << 'EOF'
           Host ssh.pokerrt.com
-            ProxyCommand cloudflared access ssh --hostname %h
+            ProxyCommand /usr/bin/cloudflared access ssh --hostname %h
             StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
           EOF
+          chmod 600 ~/.ssh/config
 
       - name: Deploy to home server (dev stack)
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ssh.pokerrt.com
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          use_insecure_cipher: false
-          script: |
-            cd ${{ secrets.SERVER_APP_PATH }}
-            git pull origin dev
-            docker compose -f docker-compose.dev.yml --env-file .env.dev up -d --build --remove-orphans
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.SERVER_USER }}@ssh.pokerrt.com "
+            cd ${{ secrets.SERVER_APP_PATH }} &&
+            git pull origin dev &&
+            docker compose -f docker-compose.dev.yml --env-file .env.dev up -d --build --remove-orphans &&
             docker image prune -f
+          "
