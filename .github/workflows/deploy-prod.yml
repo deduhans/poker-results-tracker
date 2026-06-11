@@ -9,12 +9,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Install cloudflared
+        run: |
+          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared-linux-amd64.deb
+
       - name: Deploy to home server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: ${{ secrets.SERVER_SSH_HOSTNAME }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          proxy_host: ssh.pokerrt.com
+          proxy_username: ${{ secrets.SERVER_USER }}
+          proxy_key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd ${{ secrets.SERVER_APP_PATH }}
             git pull origin main
