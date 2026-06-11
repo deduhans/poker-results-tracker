@@ -1,79 +1,60 @@
-# Poker Results Tracker - Docker Environment
+# Poker Results Tracker
 
-This guide explains how to run the Poker Results Tracker application in a Docker environment, making it accessible from multiple devices on your local network.
+NestJS backend + Vue.js frontend + PostgreSQL, served via Caddy and deployed via Cloudflare Tunnel.
 
 ## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) (Docker Compose is included in modern Docker installations)
+- [Docker](https://docs.docker.com/get-docker/)
 
-## Getting Started
+## Environment Setup
 
-1. Clone the repository (if you haven't already)
-2. Navigate to the root directory of the project
-
-## Running the Application
-
-From the root directory of the project, run:
+Copy the example env file and fill in your values:
 
 ```bash
-docker compose up -d
+cp .env.prod.example .env.prod
+cp .env.dev.example .env.dev
 ```
 
-This will:
-- Build and start the backend (NestJS)
-- Build and start the frontend with Caddy web server
-- Set up a PostgreSQL database
-- Configure the network between all services
+## Development (LAN)
 
-## Accessing the Application
+```bash
+docker compose -f docker-compose.dev.yml --env-file .env.dev up -d --build
+```
 
-### From your laptop:
+- Frontend: `http://<your-lan-ip>:8181`
+- Backend API: `http://<your-lan-ip>:3101`
 
-- Frontend: `http://localhost`
-- Backend API: `http://localhost:3000`
+## Production (Home Server)
 
-### From other devices on the same WiFi network:
+```bash
+docker compose --env-file .env.prod up -d --build
+```
 
-1. Find your laptop's IP address:
-   - On macOS: Open Terminal and run `ifconfig | grep "inet " | grep -v 127.0.0.1`
-   - On Windows: Open Command Prompt and run `ipconfig`
-
-2. Access the application:
-   - Frontend: `http://<your-laptop-ip>`
-   - Backend API: `http://<your-laptop-ip>:3000`
+Accessible publicly via `https://pokerrt.com` through Cloudflare Tunnel.
 
 ## Architecture
 
-The Docker environment consists of three containers:
+| Container | Description |
+|---|---|
+| `poker-nestapp` | NestJS backend API |
+| `poker-vueapp` | Vue.js frontend served by Caddy |
+| `poker-postgres-prod` | PostgreSQL database |
+| `poker-cloudflared` | Cloudflare Tunnel (prod only) |
 
-1. **poker-nestapp**: NestJS backend API running on port 3000
-2. **poker-vueapp**: Vue.js frontend with Caddy web server running on port 80
-3. **poker-postgres**: PostgreSQL database running on port 5433 (host) / 5432 (container)
-
-Caddy serves the frontend application and automatically proxies API requests to the backend service.
-
-## Stopping the Application
-
-To stop the application:
+## Stopping
 
 ```bash
-docker compose down
+docker compose --env-file .env.prod down
 ```
 
-To stop the application and remove all data (including the database):
+Remove all data including the database:
 
 ```bash
-docker compose down -v
+docker compose --env-file .env.prod down -v
 ```
 
-## Rebuilding After Changes
+## CI/CD
 
-If you make changes to the code, rebuild the containers:
-
-```bash
-docker compose up -d --build
-```
-
-## Data Persistence
-
-The PostgreSQL data is persisted in a Docker volume. This means your data will remain even if you stop and restart the containers.
+GitHub Actions deploys automatically:
+- `main` branch → production
+- `dev` branch → development (manual trigger)
