@@ -29,7 +29,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.SERVER_USER }}@ssh.pokerrt.com "
             cd ${{ secrets.SERVER_APP_PATH }} &&
-            git pull origin dev &&
+            git fetch origin dev && git reset --hard origin/dev &&
             docker compose -f docker-compose.dev.yml --env-file .env.dev up -d --build --remove-orphans &&
             docker image prune -f
           "
