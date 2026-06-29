@@ -17,6 +17,7 @@ import { UserService } from '@app/user/user.service';
 import { plainToInstance } from 'class-transformer';
 import { RoomDto } from '@app/room/types/RoomDto';
 import { User } from '@entities/user.entity';
+import { UserDto } from '@app/user/types/UserDto';
 import { CreatePlayerDto } from '@app/player/types/CreatePlayerDto';
 import { PlayerRoleEnum } from '@app/player/types/PlayerRoleEnum';
 import { RoomStatusEnum } from '@app/room/types/RoomStatusEnum';
@@ -70,7 +71,7 @@ export class RoomService {
     this.logger.log(`Creating new room with name: ${createRoomDto.name}`);
 
     try {
-      const host: User = await this.userService.getUserById(createRoomDto.hostId);
+      const host: UserDto = await this.userService.getUserById(createRoomDto.hostId);
 
       // Generate access token for all rooms
       const accessToken = this.generateAccessToken();

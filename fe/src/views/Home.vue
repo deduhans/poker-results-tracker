@@ -8,6 +8,30 @@
 			<NewRoom />
 		</div>
 
+		<v-alert v-if="isInsideTelegram && !linkSuccess" type="info" variant="tonal" density="compact" class="mb-4" closable>
+			<div class="d-flex align-center justify-space-between">
+				<span>Link this account to your Telegram profile for seamless access.</span>
+				<v-btn
+					size="small"
+					variant="flat"
+					color="primary"
+					:loading="linking"
+					class="ml-2"
+					@click="linkTelegramAccount"
+				>
+					Link
+				</v-btn>
+			</div>
+		</v-alert>
+
+		<v-alert v-if="linkError" type="error" variant="outlined" density="compact" class="mb-4" closable>
+			{{ linkError }}
+		</v-alert>
+
+		<v-alert v-if="linkSuccess" type="success" variant="tonal" density="compact" class="mb-4" closable>
+			Telegram account linked successfully!
+		</v-alert>
+
 		<v-alert v-if="error" type="error" variant="outlined" density="compact" class="mb-4" data-cy="error-alert">
 			{{ errorMessage }}
 		</v-alert>
@@ -27,8 +51,10 @@ import RoomController from '@/network/lib/room';
 import { onMounted, ref } from 'vue';
 import NewRoom from '@/components/NewRoom.vue';
 import type { Room } from '@/types/room/Room';
+import { useTelegramAuth } from '@/composables/useTelegramAuth';
 
 const roomController: RoomController = new RoomController();
+const { isInsideTelegram, linking, linkError, linkSuccess, linkTelegramAccount } = useTelegramAuth();
 
 const openRooms = ref<Room[]>();
 const closedRooms = ref<Room[]>();

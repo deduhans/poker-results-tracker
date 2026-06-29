@@ -10,6 +10,12 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
+  @Column({ nullable: true, unique: true, type: 'varchar' })
+  telegram_id: string | null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  telegram_username: string | null;
+
   @OneToMany(() => Player, (player) => player.user)
   players: Player[];
 }

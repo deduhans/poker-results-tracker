@@ -11,13 +11,14 @@ import { UserDto } from '@app/user/types/UserDto';
 import { User } from '@entities/user.entity';
 import { plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async getUser(username: string): Promise<UserDto> {
     const user: User | null = await this.userRepository.findOneBy({
@@ -72,5 +73,41 @@ export class UserService {
       }
       throw new InternalServerErrorException('Error creating user');
     }
+  }
+
+  async findOrCreateByTelegramId(
+    telegramId: string,
+    telegramUsername: string | null,
+  ): Promise<User> {
+    const existing = await this.userRepository.findOneBy({ telegram_id: telegramId });
+    if (existing) {
+      return existing;
+    }
+
+    const randomPassword = crypto.randomBytes(32).toString('hex');
+    const hashedPassword = await bcrypt.hash(randomPassword, 12);
+
+    const user = this.userRepository.create({
+      username: `tg_${telegramId}`,
+      password: hashedPassword,
+      telegram_id: telegramId,
+      telegram_username: telegramUsername ?? null,
+    });
+    return this.userRepository.save(user);
+  }
+
+  async linkTelegramToUser(
+    userId: number,
+    telegramId: string,
+    telegramUsername: string | null,
+  ): Promise<void> {
+    const alreadyLinked = await this.userRepository.findOneBy({ telegram_id: telegramId });
+    if (alreadyLinked && alreadyLinked.id !== userId) {
+      throw new ConflictException('This Telegram account is already linked to another user');
+    }
+    await this.userRepository.update(userId, {
+      telegram_id: telegramId,
+      telegram_username: telegramUsername ?? null,
+    });
   }
 }

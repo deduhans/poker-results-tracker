@@ -16,21 +16,31 @@ import BottomNavigation from '@/components/BottomNavigation.vue';
 import { useUserStore } from '@/stores/user';
 import { useRoomStore } from './stores/room';
 import { useAuthStore } from '@/stores/auth';
+import { useTelegramAuth } from '@/composables/useTelegramAuth';
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 const roomStore = useRoomStore();
 const userStore = useUserStore();
 const authStore = useAuthStore();
+const { isInsideTelegram, applyTelegramTheme } = useTelegramAuth();
+const router = useRouter();
 
-// Check if the user has a valid session on app load
 onMounted(async () => {
-  // If we have a valid session in the auth store, no need to check with backend
   if (authStore.isAuthenticated && authStore.isSessionValid) {
+    if (isInsideTelegram) applyTelegramTheme();
     return;
   }
 
-  // Otherwise, initialize from backend
-  await authStore.initializeAuth();
+  const sessionOk = await authStore.initializeAuth();
+
+  if (!sessionOk && isInsideTelegram) {
+    applyTelegramTheme();
+    const telegramOk = await authStore.initializeTelegramAuth();
+    if (telegramOk) {
+      router.push({ name: 'home' });
+    }
+  }
 });
 </script>
 

@@ -33,6 +33,18 @@ class AuthController {
 
     return response;
   }
+
+  async telegramLogin(initData: string): Promise<any> {
+    const url: string = `${this.CONTROLLER}/telegram`;
+    const response = await axiosClient.post(url, { initData });
+    return response.data;
+  }
+
+  async linkTelegram(initData: string): Promise<{ success: boolean }> {
+    const url: string = `${this.CONTROLLER}/link-telegram`;
+    const response = await axiosClient.post(url, { initData });
+    return response.data;
+  }
 }
 
 export default AuthController;

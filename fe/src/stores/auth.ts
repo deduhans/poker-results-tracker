@@ -67,6 +67,21 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = isAuthenticated;
     },
 
+    async initializeTelegramAuth(): Promise<boolean> {
+      const { useTelegramAuth } = await import('@/composables/useTelegramAuth');
+      const { isInsideTelegram, telegramAutoLogin } = useTelegramAuth();
+
+      if (!isInsideTelegram) return false;
+
+      const response = await telegramAutoLogin();
+      if (!response?.access_token) return false;
+
+      this.setToken(response.access_token);
+      const userStore = useUserStore();
+      userStore.setUser({ userId: response.userId, name: response.username });
+      return true;
+    },
+
     clearAuth() {
       this.isAuthenticated = false;
       this.token = null;
