@@ -22,7 +22,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --detectOpenHandles --forceExit",
     "migration:generate": "node -r tsconfig-paths/register ./node_modules/.bin/typeorm-ts-node-commonjs -d src/typeorm/data-source.ts migration:generate",
     "migration:run": "node -r tsconfig-paths/register ./node_modules/.bin/typeorm-ts-node-commonjs -d src/typeorm/data-source.ts migration:run",
-    "migration:revert": "node -r tsconfig-paths/register ./node_modules/.bin/typeorm-ts-node-commonjs -d src/typeorm/data-source.ts migration:revert"
+    "migration:revert": "node -r tsconfig-paths/register ./node_modules/.bin/typeorm-ts-node-commonjs -d src/typeorm/data-source.ts migration:revert",
+    "migration:run:prod": "typeorm migration:run -d dist/typeorm/data-source.js",
+    "migration:revert:prod": "typeorm migration:revert -d dist/typeorm/data-source.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.19",

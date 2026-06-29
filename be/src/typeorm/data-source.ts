@@ -3,7 +3,11 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import entities from './index';
 
-dotenv.config({ path: path.resolve(__dirname, '../../env/.env.local') });
+const isProd = process.env.NODE_ENV === 'production';
+
+if (!isProd) {
+  dotenv.config({ path: path.resolve(__dirname, '../../env/.env.local') });
+}
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -13,5 +17,5 @@ export const AppDataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_NAME,
   entities,
-  migrations: [path.resolve(__dirname, '../migration/*.ts')],
+  migrations: [path.resolve(__dirname, `../migration/*.${isProd ? 'js' : 'ts'}`)],
 });
