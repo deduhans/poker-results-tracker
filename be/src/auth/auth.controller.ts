@@ -39,6 +39,7 @@ export class AuthController {
     return {
       userId: user.id,
       username: user.username,
+      telegram_id: user.telegram_id ?? null,
       access_token: this.jwtService.sign(payload),
     };
   }

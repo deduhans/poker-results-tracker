@@ -24,7 +24,7 @@ export class AuthService {
       const user = await this.usersService.getUserWithPassword(username);
       const passwordValid = await bcrypt.compare(password, user.password);
       if (passwordValid) {
-        return { userId: user.id, username: user.username };
+        return { userId: user.id, username: user.username, telegram_id: user.telegram_id ?? null };
       }
       return null;
     } catch {

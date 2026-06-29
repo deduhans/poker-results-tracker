@@ -29,6 +29,10 @@ const router = useRouter();
 onMounted(async () => {
   if (isInsideTelegram) applyTelegramTheme();
 
+  if (authStore.isAuthenticated && authStore.isSessionValid) {
+    return;
+  }
+
   const sessionOk = await authStore.initializeAuth();
 
   if (!sessionOk && isInsideTelegram) {
