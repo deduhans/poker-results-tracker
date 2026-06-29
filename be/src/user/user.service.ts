@@ -103,7 +103,14 @@ export class UserService {
   ): Promise<void> {
     const alreadyLinked = await this.userRepository.findOneBy({ telegram_id: telegramId });
     if (alreadyLinked && alreadyLinked.id !== userId) {
-      throw new ConflictException('This Telegram account is already linked to another user');
+      const isAutoCreated = alreadyLinked.username.startsWith('tg_');
+      if (!isAutoCreated) {
+        throw new ConflictException('This Telegram account is already linked to another user');
+      }
+      await this.userRepository.update(alreadyLinked.id, {
+        telegram_id: null,
+        telegram_username: null,
+      });
     }
     await this.userRepository.update(userId, {
       telegram_id: telegramId,
