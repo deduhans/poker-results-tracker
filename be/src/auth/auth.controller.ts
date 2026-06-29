@@ -64,6 +64,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('/sessionStatus')
   async isLoggedIn(@Request() req): Promise<any> {
-    return req.user;
+    return this.userService.getUserById(req.user.userId);
   }
 }

@@ -1,5 +1,6 @@
 import { ref, readonly } from 'vue';
 import AuthController from '@/network/lib/auth';
+import { useUserStore } from '@/stores/user';
 
 const webApp = window.Telegram?.WebApp ?? null;
 
@@ -35,6 +36,10 @@ export function useTelegramAuth() {
       const authController = new AuthController();
       await authController.linkTelegram(webApp.initData);
       linkSuccess.value = true;
+      const userStore = useUserStore();
+      if (userStore.user) {
+        userStore.setUser({ ...userStore.user, hasTelegramLinked: true });
+      }
       return true;
     } catch (e: any) {
       linkError.value = e.response?.data?.message || 'Failed to link Telegram account';

@@ -8,7 +8,7 @@
 			<NewRoom />
 		</div>
 
-		<v-alert v-if="isInsideTelegram && !linkSuccess" type="info" variant="tonal" density="compact" class="mb-4" closable>
+		<v-alert v-if="isInsideTelegram && !userStore.hasTelegramLinked && !linkSuccess" type="info" variant="tonal" density="compact" class="mb-4" closable>
 			<div class="d-flex align-center justify-space-between">
 				<span>Link this account to your Telegram profile for seamless access.</span>
 				<v-btn
@@ -52,8 +52,10 @@ import { onMounted, ref } from 'vue';
 import NewRoom from '@/components/NewRoom.vue';
 import type { Room } from '@/types/room/Room';
 import { useTelegramAuth } from '@/composables/useTelegramAuth';
+import { useUserStore } from '@/stores/user';
 
 const roomController: RoomController = new RoomController();
+const userStore = useUserStore();
 const { isInsideTelegram, linking, linkError, linkSuccess, linkTelegramAccount } = useTelegramAuth();
 
 const openRooms = ref<Room[]>();

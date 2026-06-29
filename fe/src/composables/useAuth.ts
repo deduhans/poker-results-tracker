@@ -37,7 +37,8 @@ export function useAuth() {
 
       userStore.setUser({
         userId: response.userId,
-        name: response.username
+        name: response.username,
+        hasTelegramLinked: false,
       });
 
       authStore.setAuthenticated(true);

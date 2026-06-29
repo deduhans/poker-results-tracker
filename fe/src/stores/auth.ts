@@ -44,7 +44,8 @@ export const useAuthStore = defineStore('auth', {
           const userStore = useUserStore();
           userStore.setUser({
             userId: user.id || (user as any).userId,
-            name: user.username
+            name: user.username,
+            hasTelegramLinked: !!(user as any).telegram_id,
           });
           return true;
         } else {
@@ -78,7 +79,7 @@ export const useAuthStore = defineStore('auth', {
 
       this.setToken(response.access_token);
       const userStore = useUserStore();
-      userStore.setUser({ userId: response.userId, name: response.username });
+      userStore.setUser({ userId: response.userId, name: response.username, hasTelegramLinked: true });
       return true;
     },
 

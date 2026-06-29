@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 interface User {
   name: string;
   userId: number;
+  hasTelegramLinked: boolean;
 }
 
 export const useUserStore = defineStore('user', {
@@ -20,6 +21,10 @@ export const useUserStore = defineStore('user', {
 
     userId: (state): number | null => {
       return state.user?.userId || null;
+    },
+
+    hasTelegramLinked: (state): boolean => {
+      return !!state.user?.hasTelegramLinked;
     },
   },
 

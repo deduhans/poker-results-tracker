@@ -25,6 +25,10 @@ export class UserDto {
   @Expose()
   createdAt: Date;
 
+  @ApiProperty({ nullable: true })
+  @Expose()
+  telegram_id: string | null;
+
   @ApiProperty({ type: () => [Player] })
   @Expose()
   players: Player[];
