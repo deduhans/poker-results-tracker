@@ -1,6 +1,12 @@
 <template>
-    <v-card class="mt-16 mx-auto" max-width="400">
-        <v-card-title class="text-center">Log in</v-card-title>
+    <v-card class="auth-card mx-auto" max-width="420">
+        <div class="text-center pt-8 pb-2">
+            <v-avatar size="64" color="primary" class="mb-3">
+                <v-icon size="36" color="accent">mdi-cards-playing-outline</v-icon>
+            </v-avatar>
+            <h1 class="text-h5 font-weight-bold">Welcome back</h1>
+            <p class="text-body-2 text-medium-emphasis">Log in to track your games</p>
+        </div>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="handleLogin" data-cy="login-form">
                 <v-text-field
@@ -34,21 +40,24 @@
             ></v-alert>
         </v-card-text>
 
-        <v-card-actions>
-            <v-btn
-                color="secondary"
-                @click="register"
-                :disabled="loading"
-                data-cy="register-button"
-            >Register</v-btn>
-            <v-spacer></v-spacer>
+        <v-card-actions class="flex-column ga-2 px-4 pb-6">
             <v-btn
                 color="primary"
+                block
+                size="large"
                 @click="handleLogin"
                 :loading="loading"
                 :disabled="!valid || loading"
                 data-cy="login-button"
             >Log in</v-btn>
+            <v-btn
+                color="primary"
+                variant="text"
+                block
+                @click="register"
+                :disabled="loading"
+                data-cy="register-button"
+            >Don't have an account? Register</v-btn>
         </v-card-actions>
     </v-card>
 </template>
@@ -92,3 +101,9 @@ const handleLogin = async () => {
   }
 };
 </script>
+
+<style scoped>
+.auth-card {
+  margin-top: 10vh;
+}
+</style>

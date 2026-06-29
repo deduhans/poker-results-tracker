@@ -1,9 +1,12 @@
 <template>
 	<v-container>
-		<v-row justify="space-between" align="center" class="mb-4">
-			<v-card-title class="text-h4" data-cy="home-title">Rooms</v-card-title>
+		<div class="d-flex justify-space-between align-center mb-6">
+			<div>
+				<h1 class="text-h4 font-weight-bold" data-cy="home-title">Rooms</h1>
+				<p class="text-body-2 text-medium-emphasis mb-0">Manage your poker sessions</p>
+			</div>
 			<NewRoom />
-		</v-row>
+		</div>
 
 		<v-alert v-if="error" type="error" variant="outlined" density="compact" class="mb-4" data-cy="error-alert">
 			{{ errorMessage }}

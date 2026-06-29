@@ -1,15 +1,20 @@
 <template>
-    <v-container fluid class="pa-0 pt-4 mb-6">
-        <v-row align="center" style="height: 600px">
-            <v-col>
-                <v-row justify="center">
-                    <v-btn class="pa-2 ma-2" color="primary" @click="login">Log In</v-btn>
-                </v-row>
-                <v-row justify="center">
-                    <v-btn class="pa-2 ma-2" color="secondary" @click="signup">Sign Up</v-btn>
-                </v-row>
-            </v-col>
-        </v-row>
+    <v-container class="welcome-wrap d-flex align-center justify-center">
+        <div class="text-center welcome-inner">
+            <v-avatar size="96" color="primary" class="mb-6 elevation-4">
+                <v-icon size="56" color="accent">mdi-cards-playing-outline</v-icon>
+            </v-avatar>
+
+            <h1 class="text-h3 font-weight-bold mb-2">Poker Results Tracker</h1>
+            <p class="text-body-1 text-medium-emphasis mb-8">
+                Track buy-ins, cash-outs and settle up with your poker night crew.
+            </p>
+
+            <div class="d-flex flex-column ga-3 mx-auto" style="max-width: 280px;">
+                <v-btn size="large" color="primary" block @click="login">Log In</v-btn>
+                <v-btn size="large" color="primary" variant="tonal" block @click="signup">Sign Up</v-btn>
+            </div>
+        </div>
     </v-container>
 </template>
 
@@ -27,3 +32,14 @@ const signup = () => {
   router.push({ name: 'register' });
 };
 </script>
+
+<style scoped>
+.welcome-wrap {
+  min-height: 80vh;
+}
+
+.welcome-inner {
+  width: 100%;
+  max-width: 480px;
+}
+</style>

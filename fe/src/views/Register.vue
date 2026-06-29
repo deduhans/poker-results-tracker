@@ -1,6 +1,12 @@
 <template>
-    <v-card class="mt-16 mx-auto" max-width="400">
-        <v-card-title class="text-center">Create User</v-card-title>
+    <v-card class="auth-card mx-auto" max-width="420">
+        <div class="text-center pt-8 pb-2">
+            <v-avatar size="64" color="primary" class="mb-3">
+                <v-icon size="36" color="accent">mdi-account-plus-outline</v-icon>
+            </v-avatar>
+            <h1 class="text-h5 font-weight-bold">Create your account</h1>
+            <p class="text-body-2 text-medium-emphasis">Start tracking your poker nights</p>
+        </div>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="handleRegister" data-cy="register-form">
                 <v-text-field v-model="userName" label="Username" :rules="usernameRules" required
@@ -19,13 +25,12 @@
             </v-form>
         </v-card-text>
 
-        <v-card-actions>
-            <v-btn color="secondary" @click="goToLogin" :disabled="loading" data-cy="back-to-login-button">
-                Back to Login
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" @click="handleRegister" :loading="loading" :disabled="!valid || loading" data-cy="register-button">
+        <v-card-actions class="flex-column ga-2 px-4 pb-6">
+            <v-btn color="primary" block size="large" @click="handleRegister" :loading="loading" :disabled="!valid || loading" data-cy="register-button">
                 Create Account
+            </v-btn>
+            <v-btn color="primary" variant="text" block @click="goToLogin" :disabled="loading" data-cy="back-to-login-button">
+                Already have an account? Log in
             </v-btn>
         </v-card-actions>
     </v-card>
@@ -78,3 +83,9 @@ const handleRegister = async () => {
   }
 };
 </script>
+
+<style scoped>
+.auth-card {
+  margin-top: 8vh;
+}
+</style>

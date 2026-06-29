@@ -109,4 +109,36 @@ export default createVuetify({
       pokerDark,
     },
   },
+  defaults: {
+    VCard: {
+      rounded: 'lg',
+      elevation: 2,
+    },
+    VBtn: {
+      rounded: 'lg',
+      class: 'text-none',
+    },
+    VTextField: {
+      variant: 'outlined',
+      density: 'comfortable',
+      color: 'primary',
+    },
+    VSelect: {
+      variant: 'outlined',
+      density: 'comfortable',
+      color: 'primary',
+    },
+    VChip: {
+      rounded: 'lg',
+    },
+    VAlert: {
+      rounded: 'lg',
+    },
+    VList: {
+      rounded: 'lg',
+    },
+    VDialog: {
+      rounded: 'lg',
+    },
+  },
 });

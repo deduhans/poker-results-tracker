@@ -2,7 +2,7 @@
   <v-app class="app-container">
     <Navbar v-if="userStore.userId" />
     <v-main>
-      <v-container fluid>
+      <v-container class="content-container" :class="{ 'pb-nav': userStore.userId }">
         <router-view></router-view>
       </v-container>
     </v-main>
@@ -38,6 +38,17 @@ onMounted(async () => {
 /* Ensure the app container takes up the full screen */
 .app-container {
   min-height: 100vh;
+}
+
+/* Constrain content width on large screens for better readability */
+.content-container {
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+/* Add space so content isn't hidden behind the fixed bottom navigation */
+.pb-nav {
+  padding-bottom: 88px;
 }
 
 /* Remove border from v-app to make it full width in dark mode */
