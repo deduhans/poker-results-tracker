@@ -69,12 +69,22 @@
 html {
   font-family: var(--font-family);
   line-height: 1.5;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 body {
   margin: 0;
   padding: 0;
+}
+
+@media (max-width: 600px) {
+
+  .v-field__input,
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 /* Typography Resets */

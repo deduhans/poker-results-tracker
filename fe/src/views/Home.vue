@@ -2,7 +2,7 @@
 	<v-container>
 		<div class="d-flex justify-space-between align-center mb-6">
 			<div>
-				<h1 class="text-h4 font-weight-bold" data-cy="home-title">Rooms</h1>
+				<h1 class="text-h5 font-weight-bold" data-cy="home-title">Rooms</h1>
 				<p class="text-body-2 text-medium-emphasis mb-0">Manage your poker sessions</p>
 			</div>
 			<NewRoom />

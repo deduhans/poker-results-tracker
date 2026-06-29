@@ -1,89 +1,97 @@
 <template>
     <v-container fluid class="pa-3">
-        <v-row justify="space-between" align="center" class="mb-4 px-2">
-            <v-card-title class="text-h4" data-cy="room-header">{{ name }}</v-card-title>
-            <div class="d-flex align-center">
+        <!-- Header -->
+        <div class="d-flex flex-wrap align-center justify-space-between mb-1 ga-3">
+            <div class="d-flex align-center ga-3 flex-wrap">
+                <h1 class="text-h5 font-weight-bold mb-0" data-cy="room-header">{{ name }}</h1>
+                <v-chip :color="isOpened() ? 'success' : 'grey'" variant="flat" size="small" label
+                    data-cy="room-status">
+                    <v-icon start size="small">{{ isOpened() ? 'mdi-door-open' : 'mdi-door-closed' }}</v-icon>
+                    {{ status }}
+                </v-chip>
+            </div>
+            <div class="d-flex align-center ga-2">
                 <ShareRoom v-if="roomData" :room="roomData" @token-updated="onTokenUpdated" data-cy="share-room" />
+            </div>
+        </div>
+        <div class="text-caption text-medium-emphasis mb-4" data-cy="room-created">Created {{ created }}</div>
+
+        <!-- Summary stat tiles -->
+        <v-card variant="flat" border class="mb-2" data-cy="room-details-card">
+            <v-row no-gutters>
+                <v-col cols="4" class="stat-col">
+                    <div class="pa-3">
+                        <div class="text-caption text-medium-emphasis">On table</div>
+                        <div class="text-subtitle-2 font-weight-bold mt-1" data-cy="room-total-money">{{ formatCurrency(capacity) }}</div>
+                    </div>
+                </v-col>
+                <v-divider vertical></v-divider>
+                <v-col cols="4" class="stat-col">
+                    <div class="pa-3">
+                        <div class="text-caption text-medium-emphasis">Total chips</div>
+                        <div class="text-subtitle-2 font-weight-bold mt-1" data-cy="room-total-chips">{{ formatNumber(chipsCapacity) }}</div>
+                    </div>
+                </v-col>
+                <v-divider vertical></v-divider>
+                <v-col cols="4" class="stat-col">
+                    <div class="pa-3">
+                        <div class="text-caption text-medium-emphasis">Exchange</div>
+                        <div class="text-subtitle-2 font-weight-bold mt-1" data-cy="room-exchange">1 : {{ exchange }}</div>
+                    </div>
+                </v-col>
+            </v-row>
+        </v-card>
+
+        <!-- Players -->
+        <section class="mt-6" data-cy="players-card">
+            <div class="d-flex align-center ga-2 mb-3 px-1">
+                <v-icon color="primary">mdi-account-multiple</v-icon>
+                <h2 class="text-h6 mb-0">Players</h2>
+                <v-chip v-if="players?.length" size="x-small" variant="tonal" color="primary"
+                    data-cy="room-players-count">{{ players.length }}</v-chip>
+                <v-spacer></v-spacer>
                 <NewPlayer v-if="isOpened()" :roomId="Number(id)" data-cy="new-player-button" />
             </div>
-        </v-row>
+            <v-row v-if="sortedPlayers && sortedPlayers.length > 0" data-cy="players-list">
+                <v-col v-for="player in sortedPlayers" :key="player.id" cols="12" sm="6" lg="4">
+                    <Player :roomId="Number(id)" :player="player" :status="status" data-cy="player-item" />
+                </v-col>
+            </v-row>
+            <v-card v-else variant="flat" border class="text-center pa-8" data-cy="no-players-message">
+                <v-icon icon="mdi-account-multiple-plus" size="48" color="grey-lighten-1" class="mb-2"></v-icon>
+                <div class="text-body-1 text-medium-emphasis">No players have joined yet</div>
+                <div v-if="isOpened()" class="text-caption text-medium-emphasis">Click the "Add Player" button
+                    to add players to the room</div>
+                <div v-else class="text-caption text-medium-emphasis" data-cy="room-closed-message">This room
+                    is closed and cannot accept new players</div>
+            </v-card>
+        </section>
 
-        <v-row>
-            <v-col cols="12" md="4">
-                <v-card data-cy="room-details-card">
-                    <v-card-item>
-                        <v-card-title class="text-h6 mb-2">Room Details</v-card-title>
-                        <v-row>
-                            <v-col cols="6">
-                                <div class="d-flex flex-column">
-                                    <v-card-subtitle class="py-1" data-cy="room-exchange">Exchange: {{ exchange
-                                        }}</v-card-subtitle>
-                                    <v-card-subtitle class="py-1" data-cy="room-total-money">Total Money: {{
-                                        formatCurrency(capacity)
-                                        }}</v-card-subtitle>
-                                    <v-card-subtitle class="py-1" data-cy="room-total-chips">Total Chips: {{
-                                        formatNumber(chipsCapacity) }}</v-card-subtitle>
-                                </div>
-                            </v-col>
-                            <v-col cols="6">
-                                <div class="d-flex flex-column">
-                                    <v-card-subtitle class="py-1" data-cy="room-status">Status: {{ status
-                                        }}</v-card-subtitle>
-                                    <v-card-subtitle class="py-1" data-cy="room-created">Created: {{ created
-                                        }}</v-card-subtitle>
-                                    <v-card-subtitle class="py-1" data-cy="room-players-count">Players: {{
-                                        players?.length || 0 }}</v-card-subtitle>
-                                </div>
-                            </v-col>
-                        </v-row>
-                    </v-card-item>
-                </v-card>
-            </v-col>
+        <!-- Payment History -->
+        <section class="mt-8" data-cy="payment-history-card">
+            <div class="d-flex align-center ga-2 mb-3 px-1">
+                <v-icon color="primary">mdi-history</v-icon>
+                <h2 class="text-h6 mb-0">Payment History</h2>
+                <v-chip v-if="payments?.length" size="x-small" variant="tonal" color="primary">{{ payments.length
+                    }}</v-chip>
+            </div>
+            <v-card v-if="payments && payments.length > 0" variant="flat" border>
+                <v-list class="py-0 payment-list" data-cy="payment-history-list">
+                    <PaymentInfo v-for="payment in payments" :key="payment.id" :payment="payment"
+                        data-cy="payment-item" />
+                </v-list>
+            </v-card>
+            <v-card v-else variant="flat" border class="text-center pa-8" data-cy="no-payments-message">
+                <v-icon icon="mdi-cash-clock" size="48" color="grey-lighten-1" class="mb-2"></v-icon>
+                <div class="text-body-1 text-medium-emphasis">No payments have been made yet</div>
+                <div class="text-caption text-medium-emphasis">Click the + button on a player card to add a
+                    payment</div>
+            </v-card>
+        </section>
 
-            <v-col cols="12" md="8">
-                <section data-cy="players-card">
-                    <h2 class="text-h6 mb-2 px-1">Players</h2>
-                    <v-row v-if="sortedPlayers && sortedPlayers.length > 0" data-cy="players-list">
-                        <v-col v-for="player in sortedPlayers" :key="player.id" cols="12" sm="6" lg="4">
-                            <Player :roomId="Number(id)" :player="player" :status="status" data-cy="player-item" />
-                        </v-col>
-                    </v-row>
-                    <div v-else class="text-center pa-4" data-cy="no-players-message">
-                        <v-icon icon="mdi-account-multiple-plus" size="x-large" color="grey-lighten-1"
-                            class="mb-2"></v-icon>
-                        <div class="text-body-1 text-grey">No players have joined yet</div>
-                        <div v-if="isOpened()" class="text-caption text-grey-darken-1">Click the "Add Player" button
-                            to add players to the room</div>
-                        <div v-else class="text-caption text-grey-darken-1" data-cy="room-closed-message">This room
-                            is closed and cannot accept new players</div>
-                    </div>
-                </section>
-            </v-col>
-        </v-row>
-
-        <v-row class="mt-4">
-            <v-col cols="12">
-                <section data-cy="payment-history-card">
-                    <h2 class="text-h6 mb-2 px-1">Payment History</h2>
-                    <v-list v-if="payments && payments.length > 0" data-cy="payment-history-list">
-                        <PaymentInfo v-for="payment in payments" :key="payment.id" :payment="payment"
-                            data-cy="payment-item" />
-                    </v-list>
-                    <div v-else class="text-center pa-4" data-cy="no-payments-message">
-                        <v-icon icon="mdi-cash-clock" size="x-large" color="grey-lighten-1" class="mb-2"></v-icon>
-                        <div class="text-body-1 text-grey">No payments have been made yet</div>
-                        <div class="text-caption text-grey-darken-1">Click the + button on a player card to add a
-                            payment</div>
-                    </div>
-                </section>
-            </v-col>
-        </v-row>
-
-        <v-row class="mt-4" v-if="isOpened()">
-            <v-col cols="12">
-                <CloseRoomPopup />
-            </v-col>
-        </v-row>
+        <div class="mt-8" v-if="isOpened()">
+            <CloseRoomPopup />
+        </div>
     </v-container>
 </template>
 
@@ -209,3 +217,19 @@ const sortedPlayers = computed(() => {
     });
 });
 </script>
+
+<style scoped>
+.stat-tile {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.stat-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.payment-list {
+    max-height: 360px;
+    overflow-y: auto;
+}
+</style>

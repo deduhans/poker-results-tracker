@@ -5,7 +5,7 @@
                 <v-icon size="56" color="accent">mdi-cards-playing-outline</v-icon>
             </v-avatar>
 
-            <h1 class="text-h3 font-weight-bold mb-2">Poker Results Tracker</h1>
+            <h1 class="text-h4 font-weight-bold mb-2">Poker Results Tracker</h1>
             <p class="text-body-1 text-medium-emphasis mb-8">
                 Track buy-ins, cash-outs and settle up with your poker night crew.
             </p>
