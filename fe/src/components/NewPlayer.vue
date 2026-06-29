@@ -9,15 +9,9 @@
 
             <v-card-text>
                 <v-text-field v-model="name" label="Name" data-cy="new-player-name"></v-text-field>
-                
-                <v-checkbox
-                    v-if="!isUserAlreadyPlayer"
-                    v-model="assignToCurrentUser"
-                    label="Assign me to this player"
-                    color="primary"
-                    hide-details
-                    data-cy="assign-me-checkbox"
-                ></v-checkbox>
+
+                <v-checkbox v-if="!isUserAlreadyPlayer" v-model="assignToCurrentUser" label="Assign me to this player"
+                    color="primary" hide-details data-cy="assign-me-checkbox"></v-checkbox>
             </v-card-text>
 
             <v-card-actions>
@@ -35,7 +29,6 @@ import RoomController from '@/network/lib/room';
 import { useRoomStore } from '@/stores/room';
 import type { CreatePlayer } from '@/types/player/CreatePlayer';
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 
 const playerController = new PlayerController();
@@ -54,8 +47,8 @@ const assignToCurrentUser = ref(true);
 // Check if the current user is already assigned to a player in this room
 const isUserAlreadyPlayer = computed(() => {
     if (!userStore.userId || !roomStore.room) return false;
-    
-    return roomStore.room.players.some(player => 
+
+    return roomStore.room.players.some(player =>
         player.user && player.user.id === userStore.userId
     );
 });

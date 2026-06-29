@@ -1,4 +1,6 @@
 import axios from 'axios';
+import router from '@/router';
+import { useAuthStore } from '@/stores/auth';
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -25,7 +27,8 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('access_token');
+      useAuthStore().clearAuth();
+      router.push({ name: 'login' });
     }
     return Promise.reject(error);
   }

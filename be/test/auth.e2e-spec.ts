@@ -45,14 +45,7 @@ describe('AuthController (e2e)', () => {
       expect(response.body).toHaveProperty('userId');
       expect(response.body).toHaveProperty('username');
       expect(response.body.username).toBe(userData.username);
-
-      // Check that session cookie is set
-      const cookies = response.get('Set-Cookie');
-      expect(cookies).toBeDefined();
-      if (!cookies) {
-        throw new Error('No cookies returned from login');
-      }
-      expect(cookies.length).toBeGreaterThan(0);
+      expect(response.body).toHaveProperty('access_token');
     });
 
     it('should return 401 with invalid password', async () => {
@@ -64,34 +57,32 @@ describe('AuthController (e2e)', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should return 404 with non-existent user', async () => {
+    it('should return 401 with non-existent user', async () => {
       const response = await request(app.getHttpServer()).post('/auth/login').send({
         username: userData.nonExistentUsername,
         password: userData.password,
       });
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(401);
     });
 
-    it('should return 404 with invalid input format', async () => {
+    it('should return 401 with invalid input format', async () => {
       const response = await request(app.getHttpServer()).post('/auth/login').send({
-        username: 'te', // Too short
+        username: 'te',
         password: userData.password,
       });
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(401);
     });
   });
 
   describe('GET /auth/sessionStatus', () => {
     it('should return user data when authenticated', async () => {
-      // Use the TestHelper to create a user and get auth cookie
-      const { authCookie } = await TestHelper.createTestUser(app);
+      const { accessToken } = await TestHelper.createTestUser(app);
 
-      // Then check session status
       const response = await request(app.getHttpServer())
         .get('/auth/sessionStatus')
-        .set('Cookie', authCookie);
+        .set('Authorization', `Bearer ${accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('userId');
@@ -99,74 +90,46 @@ describe('AuthController (e2e)', () => {
       expect(response.body.username).toBe(userData.username);
     });
 
-    it('should return 403 when not authenticated', async () => {
+    it('should return 401 when not authenticated', async () => {
       const response = await request(app.getHttpServer()).get('/auth/sessionStatus');
 
-      expect(response.status).toBe(403);
+      expect(response.status).toBe(401);
     });
   });
 
   describe('GET /auth/logout', () => {
-    it('should successfully logout and destroy session', async () => {
-      // Use the TestHelper to create a user and get auth cookie
-      const { authCookie } = await TestHelper.createTestUser(app);
+    it('should return 200 when logged in', async () => {
+      const { accessToken } = await TestHelper.createTestUser(app);
 
-      // Then logout
       const logoutResponse = await request(app.getHttpServer())
         .get('/auth/logout')
-        .set('Cookie', authCookie);
+        .set('Authorization', `Bearer ${accessToken}`);
 
       expect(logoutResponse.status).toBe(200);
-      expect(logoutResponse.body).toEqual({});
-
-      // Verify session is destroyed by trying to access protected endpoint
-      const sessionResponse = await request(app.getHttpServer())
-        .get('/auth/sessionStatus')
-        .set('Cookie', authCookie);
-
-      expect(sessionResponse.status).toBe(403);
     });
 
     it('should return 200 even if not logged in', async () => {
       const response = await request(app.getHttpServer()).get('/auth/logout');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({});
     });
   });
 
   describe('Authentication flow', () => {
-    it('should maintain session across multiple requests', async () => {
-      // Use the TestHelper to create a user and get auth cookie
-      const { authCookie } = await TestHelper.createTestUser(app);
+    it('should accept token across multiple requests', async () => {
+      const { accessToken } = await TestHelper.createTestUser(app);
 
-      // Check session status
       const sessionResponse1 = await request(app.getHttpServer())
         .get('/auth/sessionStatus')
-        .set('Cookie', authCookie);
+        .set('Authorization', `Bearer ${accessToken}`);
 
       expect(sessionResponse1.status).toBe(200);
 
-      // Check session status again
       const sessionResponse2 = await request(app.getHttpServer())
         .get('/auth/sessionStatus')
-        .set('Cookie', authCookie);
+        .set('Authorization', `Bearer ${accessToken}`);
 
       expect(sessionResponse2.status).toBe(200);
-
-      // Logout
-      const logoutResponse = await request(app.getHttpServer())
-        .get('/auth/logout')
-        .set('Cookie', authCookie);
-
-      expect(logoutResponse.status).toBe(200);
-
-      // Verify session is destroyed
-      const sessionResponse3 = await request(app.getHttpServer())
-        .get('/auth/sessionStatus')
-        .set('Cookie', authCookie);
-
-      expect(sessionResponse3.status).toBe(403);
     });
   });
 });

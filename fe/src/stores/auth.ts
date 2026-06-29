@@ -18,7 +18,13 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isSessionValid: (state): boolean => {
-      return !!state.token;
+      if (!state.token) return false;
+      try {
+        const payload = JSON.parse(atob(state.token.split('.')[1]));
+        return payload.exp * 1000 > Date.now();
+      } catch {
+        return false;
+      }
     },
   },
 

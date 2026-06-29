@@ -47,12 +47,10 @@
 <script lang="ts" setup>
 import RoomController from '@/network/lib/room';
 import { useRoomStore } from '@/stores/room';
-import type { Player } from '@/types/player/Player';
 import { PlayerRoleEnum } from '@/types/player/PlayerRole';
 import type { PlayerResult } from '@/types/player/PlayerResult';
-import type { Room } from '@/types/room/Room';
+import { RoomStatusEnum } from '@/types/room/RoomStatusEnum';
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import PlayerDistributionRow from './PlayerDistributionRow.vue';
 import ChipsDistributionStats from './ChipsDistributionStats.vue';
 import { useChipsCalculation } from '@/composables/useChipsCalculation';
@@ -67,7 +65,6 @@ interface PlayerResultInput {
 }
 
 const roomController = new RoomController();
-const router = useRouter();
 const roomStore = useRoomStore();
 const { calculatePlayerChips, calculateTotalChips } = useChipsCalculation();
 
@@ -145,7 +142,7 @@ const closeRoom = async () => {
 };
 
 const isRoomOpened = () => {
-  return roomStore.roomStatus === 'opened';
+  return roomStore.roomStatus === RoomStatusEnum.Opened;
 };
 </script>
 

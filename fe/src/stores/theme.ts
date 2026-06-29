@@ -8,13 +8,13 @@ export const useThemeStore = defineStore('theme', () => {
 
   // Initialize theme from localStorage
   if (isDark.value) {
-    vuetifyTheme.global.name.value = 'pokerDark';
+    vuetifyTheme.change('pokerDark');
   }
 
   // Watch for theme changes and persist to localStorage
   watch(isDark, (newValue) => {
     const themeName = newValue ? 'pokerDark' : 'pokerLight';
-    vuetifyTheme.global.name.value = themeName;
+    vuetifyTheme.change(themeName);
     localStorage.setItem('theme', themeName);
   });
 

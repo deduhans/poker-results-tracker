@@ -2,7 +2,7 @@
 	<v-container>
 		<v-row justify="space-between" align="center" class="mb-4">
 			<v-card-title class="text-h4" data-cy="home-title">Rooms</v-card-title>
-			<NewRoom data-cy="create-room-button" />
+			<NewRoom />
 		</v-row>
 
 		<v-alert v-if="error" type="error" variant="outlined" density="compact" class="mb-4" data-cy="error-alert">

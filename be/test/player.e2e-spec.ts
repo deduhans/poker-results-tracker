@@ -11,7 +11,7 @@ import { playerData } from './fixtures/test-data';
 describe('PlayerController (e2e)', () => {
   let app: INestApplication;
   let e2eService: E2EService;
-  let authCookie: string[];
+  let accessToken: string;
   let testUser: User;
   let testRoom: Room;
 
@@ -35,17 +35,17 @@ describe('PlayerController (e2e)', () => {
     // Create a test user and get auth cookie
     const userResult = await TestHelper.createTestUser(app);
     testUser = userResult.user;
-    authCookie = userResult.authCookie;
+    accessToken = userResult.accessToken;
 
     // Create a test room
-    testRoom = await TestHelper.createTestRoom(app, authCookie, testUser.id);
+    testRoom = await TestHelper.createTestRoom(app, accessToken, testUser.id);
   });
 
   describe('POST /players', () => {
     it('should create a new player in a room', async () => {
       const response = await request(app.getHttpServer())
         .post('/players')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           name: playerData.guestName,
@@ -65,7 +65,7 @@ describe('PlayerController (e2e)', () => {
     it('should return 400 if player name is invalid', async () => {
       const response = await request(app.getHttpServer())
         .post('/players')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           name: 'T', // Too short
@@ -78,7 +78,7 @@ describe('PlayerController (e2e)', () => {
     it('should return 400 if player name contains invalid characters', async () => {
       const response = await request(app.getHttpServer())
         .post('/players')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           name: 'Player@123', // Contains special character
@@ -93,7 +93,7 @@ describe('PlayerController (e2e)', () => {
     it('should return 404 if roomId is not found', async () => {
       const response = await request(app.getHttpServer())
         .post('/players')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: 9999,
           name: playerData.guestName,
@@ -103,31 +103,31 @@ describe('PlayerController (e2e)', () => {
       expect(response.body.message).toContain('Could not find room');
     });
 
-    it('should return 403 if user is not authenticated', async () => {
+    it('should return 401 if user is not authenticated', async () => {
       await request(app.getHttpServer())
         .post('/players')
         .send({
           roomId: testRoom.id,
           name: playerData.guestName,
         })
-        .expect(403);
+        .expect(401);
     });
   });
 
   describe('Multiple players in room', () => {
-    let secondUserCookie: string[];
+    let secondUserToken: string;
 
     beforeEach(async () => {
       // Create a second test user and get auth cookie
       const secondUserResult = await TestHelper.createTestUser(app, 'seconduser');
-      secondUserCookie = secondUserResult.authCookie;
+      secondUserToken = secondUserResult.accessToken;
     });
 
     it('should allow multiple players in a room', async () => {
       // First player
       const firstPlayerResponse = await request(app.getHttpServer())
         .post('/players')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           name: 'First Player',
@@ -136,7 +136,7 @@ describe('PlayerController (e2e)', () => {
       // Second player
       const secondPlayerResponse = await request(app.getHttpServer())
         .post('/players')
-        .set('Cookie', secondUserCookie)
+        .set('Authorization', `Bearer ${secondUserToken}`)
         .send({
           roomId: testRoom.id,
           name: 'Second Player',

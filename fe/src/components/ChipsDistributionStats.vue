@@ -29,6 +29,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { formatNumber } from '@/utils/formatters';
 
 const props = defineProps<{
     total: number;
@@ -36,18 +37,14 @@ const props = defineProps<{
 }>();
 
 const remaining = computed(() => {
-  return props.total - props.distributed;
+    return props.total - props.distributed;
 });
 
 const distributedClass = computed(() => {
-  if (props.distributed > props.total) return 'text-error';
-  if (props.distributed === props.total) return 'text-success';
-  return '';
+    if (props.distributed > props.total) return 'text-error';
+    if (props.distributed === props.total) return 'text-success';
+    return '';
 });
-
-const formatNumber = (value: number) => {
-  return new Intl.NumberFormat().format(value);
-};
 </script>
 
 <style scoped>

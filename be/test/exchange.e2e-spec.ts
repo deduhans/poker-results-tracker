@@ -18,7 +18,7 @@ describe('ExchangeController (e2e)', () => {
   let roomRepository: Repository<Room>;
   let playerRepository: Repository<Player>;
   let e2eService: E2EService;
-  let authCookie: string[];
+  let accessToken: string;
   let testUser: User;
   let testRoom: Room;
   let testPlayer: Player;
@@ -45,10 +45,10 @@ describe('ExchangeController (e2e)', () => {
     // Create a test user and get auth cookie
     const userResult = await TestHelper.createTestUser(app);
     testUser = userResult.user;
-    authCookie = userResult.authCookie;
+    accessToken = userResult.accessToken;
 
     // Create a test room
-    testRoom = await TestHelper.createTestRoom(app, authCookie, testUser.id);
+    testRoom = await TestHelper.createTestRoom(app, accessToken, testUser.id);
 
     // Get the player (host) that was automatically created with the room
     const players = await playerRepository.find({
@@ -67,7 +67,7 @@ describe('ExchangeController (e2e)', () => {
 
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -92,7 +92,7 @@ describe('ExchangeController (e2e)', () => {
       // First create a buy-in
       await request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -104,7 +104,7 @@ describe('ExchangeController (e2e)', () => {
       // Then create a cash-out
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -129,13 +129,13 @@ describe('ExchangeController (e2e)', () => {
           amount: exchangeData.smallChipAmount,
           type: exchangeData.buyInDirection,
         })
-        .expect(403); // NestJS returns 403 for unauthorized requests
+        .expect(401);
     });
 
     it('should validate required fields', () => {
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({})
         .expect(400)
         .expect((res) => {
@@ -155,7 +155,7 @@ describe('ExchangeController (e2e)', () => {
     it('should validate amount is positive', () => {
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -177,7 +177,7 @@ describe('ExchangeController (e2e)', () => {
       // First create a buy-in
       await request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -189,7 +189,7 @@ describe('ExchangeController (e2e)', () => {
       // Then try to cash out more chips than bought in
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -203,11 +203,11 @@ describe('ExchangeController (e2e)', () => {
       // Create another user and room
       const secondUserResult = await TestHelper.createTestUser(app, 'testuser2');
       const secondUser = secondUserResult.user;
-      const secondUserCookie = secondUserResult.authCookie;
+      const secondUserToken = secondUserResult.accessToken;
 
       const secondRoom = await TestHelper.createTestRoom(
         app,
-        secondUserCookie,
+        secondUserToken,
         secondUser.id,
         'Second Test Room',
       );
@@ -215,7 +215,7 @@ describe('ExchangeController (e2e)', () => {
       // Try to create exchange for player in first room but using second room ID
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: secondRoom.id,
           playerId: testPlayer.id,
@@ -235,7 +235,7 @@ describe('ExchangeController (e2e)', () => {
       // Try to create exchange for closed room
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -251,7 +251,7 @@ describe('ExchangeController (e2e)', () => {
     it('should fail when room does not exist', () => {
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: 9999, // Non-existent room ID
           playerId: testPlayer.id,
@@ -267,7 +267,7 @@ describe('ExchangeController (e2e)', () => {
     it('should fail when player does not exist', () => {
       return request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: 9999, // Non-existent player ID
@@ -291,7 +291,7 @@ describe('ExchangeController (e2e)', () => {
       // First create a buy-in
       await request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -303,7 +303,7 @@ describe('ExchangeController (e2e)', () => {
       // Then create a cash-out
       await request(app.getHttpServer())
         .post('/exchanges')
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({
           roomId: testRoom.id,
           playerId: testPlayer.id,
@@ -315,7 +315,7 @@ describe('ExchangeController (e2e)', () => {
       // Get the balance
       return request(app.getHttpServer())
         .get(`/exchanges/player/${testPlayer.id}/balance`)
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(200)
         .expect(res => {
           expect(parseFloat(res.body.balance)).toBeCloseTo(parseFloat(expectedBalance), 2);
@@ -325,7 +325,7 @@ describe('ExchangeController (e2e)', () => {
     it('should return 0 for player with no exchanges', () => {
       return request(app.getHttpServer())
         .get(`/exchanges/player/${testPlayer.id}/balance`)
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(200)
         .expect(res => {
           expect(res.body.balance).toBe('0');
@@ -335,7 +335,7 @@ describe('ExchangeController (e2e)', () => {
     it('should fail when player does not exist', () => {
       return request(app.getHttpServer())
         .get('/exchanges/player/9999/balance') // Non-existent player ID
-        .set('Cookie', authCookie)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(404);
     });
   });

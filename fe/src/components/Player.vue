@@ -83,17 +83,16 @@ import type { CreateExchange } from '@/types/exchange/CreateExchange';
 import { ExchangeDirectionEnum } from '@/types/exchange/ExchangeDirectionEnum';
 import type { Player } from '@/types/player/Player';
 import { PlayerRoleEnum } from '@/types/player/PlayerRole';
+import { RoomStatusEnum } from '@/types/room/RoomStatusEnum';
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import currency from 'currency.js';
+import { formatCurrency } from '@/utils/formatters';
 
 const exchangeController = new ExchangeController();
 const roomController = new RoomController();
 const playerController = new PlayerController();
 const userStore = useUserStore();
 const roomStore = useRoomStore();
-const router = useRouter();
-const loading = ref(false);
 const assignLoading = ref(false);
 const setAdminLoading = ref(false);
 const buyInLoading = ref(false);
@@ -102,7 +101,7 @@ const cashOutLoading = ref(false);
 const props = defineProps<{
   roomId: number,
   player: Player,
-  status: any
+  status: RoomStatusEnum | null
 }>();
 
 // Check if current user is assigned to any player in this room
@@ -141,17 +140,22 @@ const createBuyIn = async () => {
   }
 
   buyInLoading.value = true;
-  const newExchange: CreateExchange = {
-    roomId: props.roomId,
-    playerId: props.player.id,
-    amount: roomStore.room.baseBuyIn,
-    type: ExchangeDirectionEnum.BuyIn,
-  };
+  try {
+    const newExchange: CreateExchange = {
+      roomId: props.roomId,
+      playerId: props.player.id,
+      amount: roomStore.room.baseBuyIn,
+      type: ExchangeDirectionEnum.BuyIn,
+    };
 
-  await exchangeController.createExchange(newExchange);
-  const updatedRoom = await roomController.getRoom(props.roomId);
-  roomStore.setRoom(updatedRoom);
-  buyInLoading.value = false;
+    await exchangeController.createExchange(newExchange);
+    const updatedRoom = await roomController.getRoom(props.roomId);
+    roomStore.setRoom(updatedRoom);
+  } catch (error) {
+    console.error('Failed to create buy-in:', error);
+  } finally {
+    buyInLoading.value = false;
+  }
 };
 
 const createCashOut = async () => {
@@ -160,18 +164,23 @@ const createCashOut = async () => {
   }
 
   cashOutLoading.value = true;
-  const cashOutAmount = roomStore.room.baseBuyIn * roomStore.room.exchange;
-  const newExchange: CreateExchange = {
-    roomId: props.roomId,
-    playerId: props.player.id,
-    amount: cashOutAmount,
-    type: ExchangeDirectionEnum.CashOut,
-  };
+  try {
+    const cashOutAmount = roomStore.room.baseBuyIn * roomStore.room.exchange;
+    const newExchange: CreateExchange = {
+      roomId: props.roomId,
+      playerId: props.player.id,
+      amount: cashOutAmount,
+      type: ExchangeDirectionEnum.CashOut,
+    };
 
-  await exchangeController.createExchange(newExchange);
-  const updatedRoom = await roomController.getRoom(props.roomId);
-  roomStore.setRoom(updatedRoom);
-  cashOutLoading.value = false;
+    await exchangeController.createExchange(newExchange);
+    const updatedRoom = await roomController.getRoom(props.roomId);
+    roomStore.setRoom(updatedRoom);
+  } catch (error) {
+    console.error('Failed to create cash-out:', error);
+  } finally {
+    cashOutLoading.value = false;
+  }
 };
 
 const assignToUser = async () => {
@@ -205,7 +214,7 @@ const setAsAdmin = async () => {
 };
 
 const isOpened = () => {
-  return props.status === 'opened';
+  return props.status === RoomStatusEnum.Opened;
 };
 
 const totalSpend = () => {
@@ -235,10 +244,6 @@ const totalIncome = () => {
 const totalCashOut = () => {
   // Total Cash Out is Income - Spent (profit/loss)
   return totalIncome() - totalSpend();
-};
-
-const formatCurrency = (value: number) => {
-  return currency(value, { symbol: '€', decimal: '.', separator: ',' }).format();
 };
 </script>
 

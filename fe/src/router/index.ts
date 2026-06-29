@@ -5,11 +5,12 @@ import Register from '@/views/Register.vue';
 import Welcome from '@/views/Welcome.vue';
 import LogIn from '@/views/LogIn.vue';
 import authGuard from './authGuard';
+import guestGuard from './guestGuard';
 
 const routes: RouteRecordRaw[] = [
-  { path: '/', name: 'welcome', component: Welcome },
-  { path: '/login', name: 'login', component: LogIn },
-  { path: '/register', name: 'register', component: Register },
+  { path: '/', name: 'welcome', component: Welcome, beforeEnter: guestGuard },
+  { path: '/login', name: 'login', component: LogIn, beforeEnter: guestGuard },
+  { path: '/register', name: 'register', component: Register, beforeEnter: guestGuard },
   { path: '/home', name: 'home', component: Home, beforeEnter: authGuard },
   { path: '/room/:id', name: 'room', props: true, component: Room, beforeEnter: authGuard },
 ];

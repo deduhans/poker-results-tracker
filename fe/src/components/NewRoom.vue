@@ -126,7 +126,7 @@ const createRoom = async () => {
   try {
     const createRoomDto: CreateRoom = {
       name: name.value.trim(),
-      exchange: Number(exchange.value) || 10,
+      exchange: Number(exchange.value),
       hostId: userStore.userId,
       currency: currency.value,
       baseBuyIn: Number(baseBuyIn.value),
@@ -135,11 +135,11 @@ const createRoom = async () => {
 
     const room: Room = await roomController.createRoom(createRoomDto);
     dialog.value = false;
-    
+
     // Include access token in route if available
     if (room.accessToken) {
-      router.push({ 
-        name: 'room', 
+      router.push({
+        name: 'room',
         params: { id: room.id },
         query: { token: room.accessToken }
       });

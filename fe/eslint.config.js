@@ -16,12 +16,12 @@ export default [
 
   ...pluginVue.configs['flat/essential'],
   ...vueTsEslintConfig(),
-  
+
   {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
   },
-  
+
   // Custom rules for all files
   {
     rules: {
@@ -39,6 +39,15 @@ export default [
       'vue/no-dupe-keys': ['error']
     }
   },
-  
+
+  {
+    name: 'app/cypress',
+    files: ['cypress/**/*.{ts,js}', 'cypress.config.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/no-namespace': 'off'
+    }
+  },
+
   skipFormatting
 ]

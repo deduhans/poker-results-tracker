@@ -1,17 +1,14 @@
 import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useAuthStore } from '@/stores/auth';
 import AuthController from '@/network/lib/auth';
 import UserController from '@/network/lib/user';
 import type { Auth } from '@/types/auth/Auth';
 import type { CreateUser } from '@/types/user/CreateUser';
-import type { User } from '@/types/user/User';
 import { extractErrorMessage, handleAuthError } from '@/utils/errorHandler';
 import { usernameRules, passwordRules, createPasswordConfirmationRule } from '@/utils/validationRules';
 
 export function useAuth() {
-  const router = useRouter();
   const userStore = useUserStore();
   const authStore = useAuthStore();
   const authController = new AuthController();
@@ -66,7 +63,7 @@ export function useAuth() {
 
     try {
       // Create the user
-      const newUser: User = await userController.createUser(createUser);
+      await userController.createUser(createUser);
 
       // Log in with the new credentials
       const auth: Auth = {
@@ -74,8 +71,7 @@ export function useAuth() {
         password: createUser.password
       };
 
-      await login(auth);
-      return true;
+      return await login(auth);
     } catch (e: any) {
       error.value = true;
       errorMessage.value = extractErrorMessage(e, 'Registration failed. Please try again.');

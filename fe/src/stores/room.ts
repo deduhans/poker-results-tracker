@@ -7,7 +7,7 @@ export const useRoomStore = defineStore('room', {
   state: (): { room: Room | null } => {
     const storedRoom = localStorage.getItem('room');
     return {
-      room: storedRoom ? JSON.parse(storedRoom).room : null,
+      room: storedRoom ? JSON.parse(storedRoom) : null,
     };
   },
 

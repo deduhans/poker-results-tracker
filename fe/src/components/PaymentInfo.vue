@@ -6,13 +6,13 @@
             </v-icon>
         </template>
         <v-list-item-title class="text-subtitle-2" data-cy="payment-item-player">{{ payment.playerName
-            }}</v-list-item-title>
+        }}</v-list-item-title>
         <template v-slot:append>
             <div class="d-flex align-center">
                 <span class="text-subtitle-2 font-weight-medium mr-4"
                     :class="payment.type === ExchangeDirectionEnum.BuyIn ? 'text-error' : 'text-success'"
                     data-cy="payment-item-amount">
-                    {{ payment.type === ExchangeDirectionEnum.BuyIn ? '-' : '+' }}{{ payment.amount }}€
+                    {{ payment.type === ExchangeDirectionEnum.BuyIn ? '-' : '+' }}{{ formatCurrency(payment.amount) }}
                 </span>
                 <span class="text-caption text-medium-emphasis" data-cy="payment-item-date">{{ payment.date }}</span>
             </div>
@@ -22,6 +22,7 @@
 
 <script lang="ts" setup>
 import { ExchangeDirectionEnum } from '@/types/exchange/ExchangeDirectionEnum';
+import { formatCurrency } from '@/utils/formatters';
 
 interface Payment {
     playerName: string;

@@ -9,7 +9,7 @@ export const useUserStore = defineStore('user', {
   state: (): { user: User | null } => {
     const storedUser = localStorage.getItem('user');
     return {
-      user: storedUser ? JSON.parse(storedUser).user : null,
+      user: storedUser ? JSON.parse(storedUser) : null,
     };
   },
 

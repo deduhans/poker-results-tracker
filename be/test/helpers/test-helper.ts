@@ -1,8 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import * as session from 'express-session';
-import * as passport from 'passport';
 import { User } from '../../src/typeorm/user.entity';
 import { Room } from '../../src/typeorm/room.entity';
 import { Player } from '../../src/typeorm/player.entity';
@@ -25,17 +23,6 @@ export class TestHelper {
       }),
     );
 
-    // Set up session middleware
-    app.use(
-      session({
-        secret: 'test-secret',
-        resave: false,
-        saveUninitialized: false,
-      }),
-    );
-    app.use(passport.initialize());
-    app.use(passport.session());
-
     await app.init();
     return app;
   }
@@ -47,8 +34,7 @@ export class TestHelper {
     app: INestApplication,
     username = 'testuser',
     password = 'Password123',
-  ): Promise<{ user: User; authCookie: string[] }> {
-    // Create user
+  ): Promise<{ user: User; accessToken: string }> {
     const createUserResponse = await request(app.getHttpServer()).post('/users').send({
       username,
       password,
@@ -56,19 +42,18 @@ export class TestHelper {
 
     const user = createUserResponse.body;
 
-    // Login and get session cookie
     const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
       username,
       password,
     });
 
-    const authCookie = loginResponse.get('Set-Cookie');
+    const accessToken = loginResponse.body.access_token;
 
-    if (!authCookie) {
-      throw new Error('No auth cookie returned from login');
+    if (!accessToken) {
+      throw new Error('No access token returned from login');
     }
 
-    return { user, authCookie };
+    return { user, accessToken };
   }
 
   /**
@@ -76,14 +61,14 @@ export class TestHelper {
    */
   static async createTestRoom(
     app: INestApplication,
-    authCookie: string[],
+    accessToken: string,
     hostId?: number,
     name = 'Test Room',
     exchange = 100,
   ): Promise<Room> {
     const response = await request(app.getHttpServer())
       .post('/rooms')
-      .set('Cookie', authCookie)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name,
         exchange,
@@ -98,14 +83,14 @@ export class TestHelper {
    */
   static async createTestPlayer(
     app: INestApplication,
-    authCookie: string[],
+    accessToken: string,
     roomId: number,
     name = 'Guest Player',
     role = PlayerRoleEnum.Player,
   ): Promise<Player> {
     const response = await request(app.getHttpServer())
       .post('/players')
-      .set('Cookie', authCookie)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name,
         roomId,
@@ -120,13 +105,13 @@ export class TestHelper {
    */
   static async createBuyInExchange(
     app: INestApplication,
-    authCookie: string[],
+    accessToken: string,
     playerId: number,
     chipAmount = 100,
   ): Promise<Exchange> {
     const response = await request(app.getHttpServer())
       .post('/exchanges')
-      .set('Cookie', authCookie)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         playerId,
         direction: ExchangeDirectionEnum.BuyIn,
@@ -141,13 +126,13 @@ export class TestHelper {
    */
   static async createCashOutExchange(
     app: INestApplication,
-    authCookie: string[],
+    accessToken: string,
     playerId: number,
     chipAmount = 100,
   ): Promise<Exchange> {
     const response = await request(app.getHttpServer())
       .post('/exchanges')
-      .set('Cookie', authCookie)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         playerId,
         direction: ExchangeDirectionEnum.CashOut,
@@ -162,13 +147,13 @@ export class TestHelper {
    */
   static async closeRoom(
     app: INestApplication,
-    authCookie: string[],
+    accessToken: string,
     roomId: number,
     playersResults: { id: number; income: number }[],
   ): Promise<Room> {
     const response = await request(app.getHttpServer())
       .put(`/rooms/close/${roomId}`)
-      .set('Cookie', authCookie)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send(playersResults);
 
     return response.body;

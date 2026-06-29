@@ -11,8 +11,9 @@
                 data-cy="room-list-item">
                 <template v-slot:prepend>
                     <div class="d-flex align-center mr-2">
-                        <v-icon :color="room.status === 'opened' ? 'success' : 'grey'" data-cy="room-status-icon">
-                            {{ room.status === 'opened' ? 'mdi-door-open' : 'mdi-door-closed' }}
+                        <v-icon :color="room.status === RoomStatusEnum.Opened ? 'success' : 'grey'"
+                            data-cy="room-status-icon">
+                            {{ room.status === RoomStatusEnum.Opened ? 'mdi-door-open' : 'mdi-door-closed' }}
                         </v-icon>
                     </div>
                 </template>
@@ -25,8 +26,8 @@
                 </v-list-item-subtitle>
 
                 <template v-slot:append>
-                    <v-chip size="small" :color="room.status === 'opened' ? 'success' : 'grey'" variant="outlined"
-                        data-cy="room-status-chip">
+                    <v-chip size="small" :color="room.status === RoomStatusEnum.Opened ? 'success' : 'grey'"
+                        variant="outlined" data-cy="room-status-chip">
                         {{ room.status }}
                     </v-chip>
                 </template>
@@ -37,8 +38,10 @@
 
 <script lang="ts" setup>
 import type { Room } from '@/types/room/Room';
+import { RoomStatusEnum } from '@/types/room/RoomStatusEnum';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
+import { formatTimeAgo } from '@/utils/formatters';
 
 const props = defineProps<{
     listName: string,
@@ -53,28 +56,6 @@ const isListEmpty = computed(() => {
 
 const handleRoomClick = (room: Room) => {
     router.push({ name: 'room', params: { id: room.id } });
-};
-
-const formatTimeAgo = (date: Date) => {
-    if (!date) return '';
-    
-    const now = new Date();
-    const createdDate = new Date(date);
-    const diffInMs = now.getTime() - createdDate.getTime();
-    
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-    
-    if (diffInDays > 0) {
-        return `${diffInDays}d ago`;
-    } else if (diffInHours > 0) {
-        return `${diffInHours}h ago`;
-    } else if (diffInMinutes > 0) {
-        return `${diffInMinutes}m ago`;
-    } else {
-        return 'just now';
-    }
 };
 </script>
 

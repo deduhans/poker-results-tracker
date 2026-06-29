@@ -29,7 +29,7 @@ Cypress.Commands.add('createUser', (user: CreateUser) => {
     url: `${Cypress.env('apiUrl')}/users`,
     body: user
   }).then((response) => {
-    let newUser: User = response.body;
+    const newUser: User = response.body;
     newUser.password = user.password;
     return newUser;
   });
@@ -67,7 +67,7 @@ Cypress.Commands.add('createRoom', (room: CreateRoom) => {
     url: `${Cypress.env('apiUrl')}/rooms`,
     body: room
   }).then((response) => {
-    let newRoom: Room = response.body;
+    const newRoom: Room = response.body;
     return newRoom;
   });
 });
@@ -78,7 +78,7 @@ Cypress.Commands.add('createPlayer', (player: CreatePlayer) => {
     url: `${Cypress.env('apiUrl')}/players`,
     body: player
   }).then((response) => {
-    let newPlayer: Player = response.body;
+    const newPlayer: Player = response.body;
     return newPlayer;
   });
 });
@@ -89,7 +89,7 @@ Cypress.Commands.add('createPayment', (payment: CreateExchange) => {
     url: `${Cypress.env('apiUrl')}/payments`,
     body: payment
   }).then((response) => {
-    let newPayment: Exchange = response.body;
+    const newPayment: Exchange = response.body;
     return newPayment;
   });
 });
